@@ -1,5 +1,7 @@
 import os
 import json
+
+
 def check_directory_permissions(path: str) -> bool:
     # Get the parent directory of the path
     parent_dir = os.path.dirname(path)
