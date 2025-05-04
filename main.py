@@ -41,7 +41,6 @@ if __name__ == "__main__":
     if not os.path.exists(args.config_file):
         if not check_directory_permissions(args.config_file):
             raise PermissionError(f"Program does not have permission to create config directory at {os.path.dirname(args.config_file)}")
-        # make config file
 
     if not os.path.exists(args.watch_file):
         raise FileNotFoundError(f"Watch file not found: {args.watch_file}")    

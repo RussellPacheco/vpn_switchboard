@@ -109,10 +109,7 @@ class Core:
         self._stop_vpns()
 
         self.available_vpns[vpn]["currently_active"] = True
-        self.available_vpns[vpn]["last_usage_time"] = datetime.datetime.now()
-        self.available_vpns[vpn]["last_download_speed"] = None
-        self.available_vpns[vpn]["download_speeds"] = []
-        self.available_vpns[vpn]["average_download_speed"] = None
+        self.available_vpns[vpn]["last_usage_time"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
         self._start_vpn(vpn)
         write_json_to_file("./available_vpns.json", self.available_vpns)
@@ -123,7 +120,7 @@ class Core:
 
         logger.debug("Choosing best VPN")
 
-        unused_vpns = [vpn for vpn in self.available_vpns if not self.available_vpns[vpn]["currently_active"] and self.available_vpns[vpn]["last_usage_time"] is None]
+        unused_vpns = [vpn for vpn in self.available_vpns if not self.available_vpns[vpn]["currently_active"] and self.available_vpns[vpn]["average_download_speed"] is None]
 
         if len(unused_vpns) > 0:
             return random.choice(unused_vpns)
@@ -151,7 +148,10 @@ class Core:
         for vpn in self.available_vpns:
             if self.available_vpns[vpn]["currently_active"]:
                 self.available_vpns[vpn]["last_download_speed"] = download_speed
-                self.available_vpns[vpn]["download_speeds"].append(download_speed)
+                if len(self.available_vpns[vpn]["download_speeds"]) >= 30:
+                    self.available_vpns[vpn]["download_speeds"] = self.available_vpns[vpn]["average_download_speed"]
+                else:
+                    self.available_vpns[vpn]["download_speeds"].append(download_speed)
                 self.available_vpns[vpn]["average_download_speed"] = round(sum(self.available_vpns[vpn]["download_speeds"]) / len(self.available_vpns[vpn]["download_speeds"]), 2)
         write_json_to_file("./available_vpns.json", self.available_vpns)
 
